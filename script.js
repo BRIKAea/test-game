@@ -1,6 +1,10 @@
 const cells = document.querySelectorAll('[data-cell]');
 let currentPlayer = 'X';
 let gameActive = true;
+const restartButton = document.getElementById('restartButton');
+const statusDisplay = document.querySelector('.game-status');
+
+restartButton.addEventListener('click', restartGame);
 
 cells.forEach(cell => {
     cell.addEventListener('click', handleClick, { once: true });
@@ -11,10 +15,13 @@ function handleClick(e) {
     if (!gameActive || cell.textContent !== '') return;
 
     cell.textContent = currentPlayer;
-    if (checkWin() || checkDraw()) {
-        gameActive = false;
+    if (checkWin()) {
+        gameOver(false);
+    } else if (checkDraw()) {
+        gameOver(true);
     } else {
         currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        updateStatusDisplay();
     }
 }
 
@@ -41,4 +48,27 @@ function checkDraw() {
     return [...cells].every(cell => {
         return cell.textContent !== '';
     });
+}
+
+function gameOver(draw) {
+    if (draw) {
+        statusDisplay.textContent = 'Ничья!';
+    } else {
+        statusDisplay.textContent = `${currentPlayer === 'X' ? 'Крестик' : 'Нолик'} выиграл!`;
+    }
+    gameActive = false;
+}
+
+function restartGame() {
+    gameActive = true;
+    currentPlayer = 'X';
+    statusDisplay.textContent = '';
+    cells.forEach(cell => {
+        cell.textContent = '';
+    });
+    updateStatusDisplay();
+}
+
+function updateStatusDisplay() {
+    statusDisplay.textContent = `${currentPlayer === 'X' ? "Ходят крестики" : "Ходят нолики"}`;
 }
