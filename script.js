@@ -1,10 +1,6 @@
+const board = document.getElementById('board');
 const cells = document.querySelectorAll('[data-cell]');
 let currentPlayer = 'X';
-let gameActive = true;
-const restartButton = document.getElementById('restartButton');
-const statusDisplay = document.querySelector('.game-status');
-
-restartButton.addEventListener('click', restartGame);
 
 cells.forEach(cell => {
     cell.addEventListener('click', handleClick, { once: true });
@@ -12,21 +8,22 @@ cells.forEach(cell => {
 
 function handleClick(e) {
     const cell = e.target;
-    if (!gameActive || cell.textContent !== '') return;
-
-    cell.textContent = currentPlayer;
-    if (checkWin()) {
-        gameOver(false);
-    } else if (checkDraw()) {
-        gameOver(true);
+    placeMark(cell, currentPlayer);
+    if (checkWin(currentPlayer)) {
+        alert(`${currentPlayer} выиграл!`);
+    } else if (isDraw()) {
+        alert('Ничья!');
     } else {
         currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-        updateStatusDisplay();
     }
 }
 
-function checkWin() {
-    const winningConditions = [
+function placeMark(cell, currentPlayer) {
+    cell.textContent = currentPlayer;
+}
+
+function checkWin(currentPlayer) {
+    const winningCombos = [
         [0, 1, 2],
         [3, 4, 5],
         [6, 7, 8],
@@ -37,38 +34,15 @@ function checkWin() {
         [2, 4, 6]
     ];
 
-    return winningConditions.some(combination => {
+    return winningCombos.some(combination => {
         return combination.every(index => {
             return cells[index].textContent === currentPlayer;
         });
     });
 }
 
-function checkDraw() {
+function isDraw() {
     return [...cells].every(cell => {
-        return cell.textContent !== '';
+        return cell.textContent === 'X' || cell.textContent === 'O';
     });
-}
-
-function gameOver(draw) {
-    if (draw) {
-        statusDisplay.textContent = 'Ничья!';
-    } else {
-        statusDisplay.textContent = `${currentPlayer === 'X' ? 'Крестик' : 'Нолик'} выиграл!`;
-    }
-    gameActive = false;
-}
-
-function restartGame() {
-    gameActive = true;
-    currentPlayer = 'X';
-    statusDisplay.textContent = '';
-    cells.forEach(cell => {
-        cell.textContent = '';
-    });
-    updateStatusDisplay();
-}
-
-function updateStatusDisplay() {
-    statusDisplay.textContent = `${currentPlayer === 'X' ? "Ходят крестики" : "Ходят нолики"}`;
 }
